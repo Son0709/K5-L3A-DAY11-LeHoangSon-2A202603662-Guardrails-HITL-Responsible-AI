@@ -1,5 +1,43 @@
 # Day 11 — Controlled Agent Security (2026)
 
+## Thông tin bài nộp
+
+| | |
+|---|---|
+| **Họ tên** | Lê Hoàng Sơn |
+| **MSSV** | 2A202603662 |
+| **Lớp** | K5-L3A |
+| **Red / Red Advance** | Gemini `gemini-3.5-flash` (`RED_TEAM_PROVIDER=gemini`) |
+| **Blue** | Liquid.ai `lfm3-1.7b` qua `https://api.liquid.ai/openai/v1` (`LIQUID_API_KEY`) |
+
+> **Lưu ý về Blue:** theo yêu cầu của giảng viên, Blue chuyển từ OpenRouter sang Liquid.ai
+> (cùng dòng model LFM3 1.7B; ID trên Liquid là `lfm3-1.7b`). Thay đổi nằm ở
+> `src/core/config.py`, `src/core/utils.py` và `.env.example`.
+
+### Cách chạy ngắn
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+Copy-Item .env.example .env      # điền LIQUID_API_KEY + GOOGLE_API_KEY
+pip install -r requirements.txt
+
+python src/main.py --part 2      # CP2: guardrails (in terminal)
+python src/main.py --part 3      # CP3: outputs/results.json, audit_log.json, metrics.json
+python src/main.py --part 4      # CP4: outputs/attack_results.json (+ unsafe/guards)
+pytest tests/smoke tests/public -q
+python scripts/grade.py --submission-dir . --out outputs/grade_report.json
+```
+
+### Đã làm
+
+- **CP2:** `src/guardrails/` — `detect_injection` (chuẩn hoá Unicode + 17 regex EN/VI), `topic_filter`, `content_filter` (redact PII/secret) và hai plugin.
+- **CP3:** `src/assignment/` — rate limiter sliding window, audit log, monitoring + alert, `is_egress_allowed`, `run_assignment_suite`.
+- **CP4:** `src/attacks/attacks.py` — 5 prompt tấn công, chạy lên Red và Red Advance.
+- Không làm (không chấm): HITL, `testing/`, LLM-as-Judge.
+
+---
+
 > 👤 **Hình thức:** bài tập **cá nhân** (1 người / 1 MSSV).  
 > 🎯 **Mục tiêu:** đóng vai **Blue Team** để học cách xây Guardrails phòng thủ, rồi đóng vai **Red Team** để tấn công agent **Red** hoặc **Red Advance**.  
 > ✅ Làm theo **Checkpoint 1 → 5** trong [`CHECKPOINTS.md`](CHECKPOINTS.md) · nộp theo [`SUBMISSION.md`](SUBMISSION.md).
